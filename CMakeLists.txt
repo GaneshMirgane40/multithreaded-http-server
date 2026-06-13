@@ -11,4 +11,5 @@ add_executable(
     src/main.cpp
     src/server.cpp
     src/http_request.cpp
+    src/router.cpp
 )

@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstring>
 #include "http_request.h"
+#include "router.h"
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port)
@@ -137,20 +138,26 @@ if(request.parse(rawRequest))
     std::cout
         << "==========================\n";
 }
+Router router;
+
+std::string body =
+    router.route(request.path);
 
 
-const char* response =
+std::string response =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/plain\r\n"
-    "Content-Length: 11\r\n"
-    "Connection: close\r\n"
+    "Content-Length: " +
+    std::to_string(body.length()) +
     "\r\n"
-    "Hello World";
+    "Connection: close\r\n"
+    "\r\n" +
+    body;
 
 send(
     client_socket,
-    response,
-    strlen(response),
+    response.c_str(),
+    response.length(),
     0
 );
 
