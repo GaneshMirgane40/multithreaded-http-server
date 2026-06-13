@@ -8,6 +8,7 @@
 #include <cstring>
 #include "http_request.h"
 #include "router.h"
+#include "file_handler.h"
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port)
@@ -139,14 +140,33 @@ if(request.parse(rawRequest))
         << "==========================\n";
 }
 Router router;
+FileHandler fileHandler;
 
-std::string body =
+std::string filepath =
     router.route(request.path);
 
+std::string body;
 
+if(filepath.empty())
+{
+    body =
+        "<h1>404 Not Found</h1>";
+}
+else
+{
+    body = fileHandler.readFile(filepath);
+
+    std::cout << "File path: "
+              << filepath
+              << "\n";
+
+    std::cout << "Body size: "
+              << body.size()
+              << "\n";
+}
 std::string response =
     "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/plain\r\n"
+    "Content-Type: text/html\r\n"
     "Content-Length: " +
     std::to_string(body.length()) +
     "\r\n"

@@ -4,18 +4,18 @@ std::string Router::route(const std::string& path)
 {
     if(path == "/")
     {
-        return "Welcome to Home Page";
+        return "../public/index.html";
     }
 
     if(path == "/about")
     {
-        return "About Page";
+        return "../public/about.html";
     }
 
     if(path == "/contact")
     {
-        return "Contact Page";
+        return "../public/contact.html";
     }
 
-    return "404 Not Found";
+    return "";
 }
