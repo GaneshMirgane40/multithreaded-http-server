@@ -1,7 +1,9 @@
 #include "server.h"
+#include "thread_pool.h"
 
 int main()
 {
+    ThreadPool pool(4);
     BasicServer server(8080);
 
     if(!server.start())
@@ -10,6 +12,7 @@ int main()
     }
 
     server.run();
+    
 
     return 0;
 }

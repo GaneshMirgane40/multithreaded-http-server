@@ -14,4 +14,5 @@ add_executable(
     src/router.cpp
     src/file_handler.cpp
     src/logger.cpp
+    src/thread_pool.cpp
 )
