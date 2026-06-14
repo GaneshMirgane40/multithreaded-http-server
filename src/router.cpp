@@ -17,5 +17,5 @@ std::string Router::route(const std::string& path)
         return "../public/contact.html";
     }
 
-    return "";
+    return "../public/404.html";
 }

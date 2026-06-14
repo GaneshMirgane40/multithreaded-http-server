@@ -152,6 +152,9 @@ FileHandler fileHandler;
 
 std::string filepath =
     router.route(request.path);
+    
+    bool is404 =
+    (filepath == "../public/404.html");
 
 std::string body;
 
@@ -172,8 +175,13 @@ else
               << body.size()
               << "\n";
 }
+std::string statusLine =
+    is404
+    ? "HTTP/1.1 404 Not Found\r\n"
+    : "HTTP/1.1 200 OK\r\n";
+
 std::string response =
-    "HTTP/1.1 200 OK\r\n"
+    statusLine +
     "Content-Type: text/html\r\n"
     "Content-Length: " +
     std::to_string(body.length()) +
