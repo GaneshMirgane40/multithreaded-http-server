@@ -9,6 +9,7 @@
 #include "http_request.h"
 #include "router.h"
 #include "file_handler.h"
+#include "logger.h"
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port)
@@ -118,6 +119,12 @@ else
 
 if(request.parse(rawRequest))
 {
+    Logger logger;
+
+logger.logRequest(
+    request.method,
+    request.path
+);
     std::cout
         << "\n===== PARSED REQUEST =====\n";
 
@@ -138,6 +145,7 @@ if(request.parse(rawRequest))
 
     std::cout
         << "==========================\n";
+        
 }
 Router router;
 FileHandler fileHandler;
