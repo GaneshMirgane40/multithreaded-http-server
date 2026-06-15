@@ -11,10 +11,10 @@
 #include "router.h"
 #include "file_handler.h"
 #include "logger.h"
-
 BasicServer::BasicServer(int port)
     : server_socket(-1),
-      port(port)
+      port(port),
+      threadPool(4)
 {
 }
 
@@ -105,9 +105,14 @@ void BasicServer::run()
         std::cout
             << "New client connected!\n";
 
+       threadPool.enqueue(
+    [this, client_socket]()
+    {
         handleClient(
             client_socket
         );
+    }
+);
     }
 }
 
