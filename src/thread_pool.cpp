@@ -51,6 +51,12 @@ ThreadPool::ThreadPool(
                         tasks.pop();
                     }
 
+                    std::cout
+                        << "Worker "
+                        << i
+                        << " processing task"
+                        << std::endl;
+
                     task();
                 }
             }

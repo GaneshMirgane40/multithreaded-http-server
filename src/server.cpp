@@ -6,11 +6,11 @@
 #include <unistd.h>
 #include <cerrno>
 #include <cstring>
-
 #include "http_request.h"
 #include "router.h"
 #include "file_handler.h"
 #include "logger.h"
+
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port),
@@ -105,14 +105,14 @@ void BasicServer::run()
         std::cout
             << "New client connected!\n";
 
-       threadPool.enqueue(
-    [this, client_socket]()
-    {
-        handleClient(
-            client_socket
+        threadPool.enqueue(
+            [this, client_socket]()
+            {
+                handleClient(
+                    client_socket
+                );
+            }
         );
-    }
-);
     }
 }
 
@@ -120,6 +120,7 @@ void BasicServer::handleClient(
     int client_socket
 )
 {
+
     char buffer[4096] = {0};
 
     ssize_t bytes_received =
