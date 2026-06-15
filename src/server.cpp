@@ -6,11 +6,12 @@
 #include <unistd.h>
 #include <cerrno>
 #include <cstring>
+
 #include "http_request.h"
 #include "router.h"
 #include "file_handler.h"
 #include "logger.h"
-// #include "thread_pool.h"
+
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port)
@@ -45,30 +46,37 @@ bool BasicServer::start()
             sizeof(server_addr)
         ) < 0)
     {
-        std::cerr << "Bind failed: "
-          << strerror(errno)
-          << "\n";
+        std::cerr
+            << "Bind failed: "
+            << strerror(errno)
+            << "\n";
+
         return false;
     }
 
-    std::cout << "Socket bound to port "
-              << port
-              << "\n";
+    std::cout
+        << "Socket bound to port "
+        << port
+        << "\n";
 
-   
-if(listen(server_socket, 5) < 0)
-{
-    std::cerr << "Listen failed: "
-      << strerror(errno)
-      << "\n";
-    return false;
+    if(listen(server_socket, 5) < 0)
+    {
+        std::cerr
+            << "Listen failed: "
+            << strerror(errno)
+            << "\n";
+
+        return false;
+    }
+
+    std::cout
+        << "Listening on port "
+        << port
+        << "\n";
+
+    return true;
 }
 
-std::cout << "Listening on port "
-          << port
-          << "\n";
-          return true;
-}
 void BasicServer::run()
 {
     std::cout << "Waiting for clients...\n";
@@ -76,7 +84,8 @@ void BasicServer::run()
     while(true)
     {
         sockaddr_in client_addr{};
-        socklen_t client_len = sizeof(client_addr);
+        socklen_t client_len =
+            sizeof(client_addr);
 
         int client_socket =
             accept(
@@ -87,117 +96,127 @@ void BasicServer::run()
 
         if(client_socket < 0)
         {
-            std::cerr << "Accept failed\n";
+            std::cerr
+                << "Accept failed\n";
+
             continue;
         }
 
-       std::cout << "New client connected!\n";
+        std::cout
+            << "New client connected!\n";
 
-char buffer[4096] = {0};
+        handleClient(
+            client_socket
+        );
+    }
+}
 
-ssize_t bytes_received =
-    recv(
-        client_socket,
-        buffer,
-        sizeof(buffer) - 1,
-        0
-    );
+void BasicServer::handleClient(
+    int client_socket
+)
+{
+    char buffer[4096] = {0};
+
+    ssize_t bytes_received =
+        recv(
+            client_socket,
+            buffer,
+            sizeof(buffer) - 1,
+            0
+        );
+
     std::string rawRequest(buffer);
 
-HttpRequest request;
+    HttpRequest request;
 
-if(bytes_received < 0)
-{
-    std::cerr << "recv failed\n";
-}
-else
-{
+    if(bytes_received < 0)
+    {
+        std::cerr
+            << "recv failed\n";
+
+        close(client_socket);
+        return;
+    }
+
     std::cout
         << "\n===== REQUEST =====\n"
         << buffer
         << "\n===================\n";
-}
 
-if(request.parse(rawRequest))
-{
-    Logger logger;
+    if(request.parse(rawRequest))
+    {
+        Logger logger;
 
-logger.logRequest(
-    request.method,
-    request.path
-);
-    std::cout
-        << "\n===== PARSED REQUEST =====\n";
+        logger.logRequest(
+            request.method,
+            request.path
+        );
 
-    std::cout
-        << "Method: "
-        << request.method
-        << "\n";
+        std::cout
+            << "\n===== PARSED REQUEST =====\n";
 
-    std::cout
-        << "Path: "
-        << request.path
-        << "\n";
+        std::cout
+            << "Method: "
+            << request.method
+            << "\n";
 
-    std::cout
-        << "Version: "
-        << request.version
-        << "\n";
+        std::cout
+            << "Path: "
+            << request.path
+            << "\n";
 
-    std::cout
-        << "==========================\n";
-        
-}
-Router router;
-FileHandler fileHandler;
+        std::cout
+            << "Version: "
+            << request.version
+            << "\n";
 
-std::string filepath =
-    router.route(request.path);
-    
-    bool is404 =
-    (filepath == "../public/404.html");
-
-std::string body;
-
-if(filepath.empty())
-{
-    body =
-        "<h1>404 Not Found</h1>";
-}
-else
-{
-    body = fileHandler.readFile(filepath);
-
-    std::cout << "File path: "
-              << filepath
-              << "\n";
-
-    std::cout << "Body size: "
-              << body.size()
-              << "\n";
-}
-std::string statusLine =
-    is404
-    ? "HTTP/1.1 404 Not Found\r\n"
-    : "HTTP/1.1 200 OK\r\n";
-
-std::string response =
-    statusLine +
-    "Content-Type: text/html\r\n"
-    "Content-Length: " +
-    std::to_string(body.length()) +
-    "\r\n"
-    "Connection: close\r\n"
-    "\r\n" +
-    body;
-
-send(
-    client_socket,
-    response.c_str(),
-    response.length(),
-    0
-);
-
-close(client_socket);
+        std::cout
+            << "==========================\n";
     }
+
+    Router router;
+    FileHandler fileHandler;
+
+    std::string filepath =
+        router.route(request.path);
+
+    bool is404 =
+        (filepath == "../public/404.html");
+
+    std::string body =
+        fileHandler.readFile(filepath);
+
+    std::cout
+        << "File path: "
+        << filepath
+        << "\n";
+
+    std::cout
+        << "Body size: "
+        << body.size()
+        << "\n";
+
+    std::string statusLine =
+        is404
+        ? "HTTP/1.1 404 Not Found\r\n"
+        : "HTTP/1.1 200 OK\r\n";
+
+    std::string response =
+        statusLine +
+        "Content-Type: text/html\r\n"
+        "Content-Length: " +
+        std::to_string(body.length()) +
+        "\r\n"
+        "Connection: close\r\n"
+        "\r\n" +
+        body;
+
+    send(
+        client_socket,
+        response.c_str(),
+        response.length(),
+        0
+    );
+
+    close(client_socket);
 }
