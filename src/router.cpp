@@ -20,6 +20,10 @@ std::string Router::route(const std::string& path)
 {
     return "../public/style.css";
 }
+if(path == "/script.js")
+{
+    return "../public/script.js";
+}
 
     return "../public/404.html";
 }
