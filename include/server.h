@@ -12,13 +12,14 @@ private:
 
     ThreadPool threadPool;
     ServerStats stats;
-
+    bool running;
 public:
     explicit BasicServer(int port);
 
     bool start();
 
     void run();
+    void stop();
 
     void handleClient(
         int client_socket

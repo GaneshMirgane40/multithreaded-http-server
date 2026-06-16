@@ -15,7 +15,8 @@
 BasicServer::BasicServer(int port)
     : server_socket(-1),
       port(port),
-      threadPool(4)
+      threadPool(4),
+      running(true)
 {
 }
 
@@ -77,12 +78,18 @@ bool BasicServer::start()
 
     return true;
 }
+void BasicServer::stop()
+{
+    running = false;
+
+    close(server_socket);
+}
 
 void BasicServer::run()
 {
     std::cout << "Waiting for clients...\n";
 
-    while(true)
+    while(running)
     {
         sockaddr_in client_addr{};
         socklen_t client_len =
@@ -96,13 +103,17 @@ void BasicServer::run()
             );
 
         if(client_socket < 0)
-        {
-            std::cerr
-                << "Accept failed\n";
+{
+    if(!running)
+    {
+        break;
+    }
 
-            continue;
-        }
+    std::cerr
+        << "Accept failed\n";
 
+    continue;
+}
         std::cout
             << "New client connected!\n";
 
