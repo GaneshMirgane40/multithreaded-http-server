@@ -10,6 +10,7 @@
 #include "router.h"
 #include "file_handler.h"
 #include "logger.h"
+#include "mime_types.h"
 
 BasicServer::BasicServer(int port)
     : server_socket(-1),
@@ -228,10 +229,25 @@ else
         is404
         ? "HTTP/1.1 404 Not Found\r\n"
         : "HTTP/1.1 200 OK\r\n";
+        std::string contentType =
+    "text/html";
+
+if(request.path != "/stats")
+{
+    std::string filepath =
+        router.route(request.path);
+
+    contentType =
+        MimeTypes::getMimeType(
+            filepath
+        );
+}
 
     std::string response =
         statusLine +
-        "Content-Type: text/html\r\n"
+        "Content-Type: "
++ contentType +
+"\r\n"
         "Content-Length: " +
         std::to_string(body.length()) +
         "\r\n"

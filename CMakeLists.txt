@@ -16,4 +16,5 @@ add_executable(
     src/logger.cpp
     src/thread_pool.cpp
     src/server_stats.cpp
+    src/mime_types.cpp
 )

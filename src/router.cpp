@@ -16,6 +16,10 @@ std::string Router::route(const std::string& path)
     {
         return "../public/contact.html";
     }
+    if(path == "/style.css")
+{
+    return "../public/style.css";
+}
 
     return "../public/404.html";
 }
