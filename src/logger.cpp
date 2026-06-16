@@ -5,11 +5,16 @@
 #include <ctime>
 #include <iomanip>
 
+std::mutex Logger::logMutex;
+
 void Logger::logRequest(
     const std::string& method,
     const std::string& path
 )
 {
+    std::lock_guard<std::mutex>
+        lock(logMutex);
+
     std::ofstream logFile(
         "../logs/server.log",
         std::ios::app
