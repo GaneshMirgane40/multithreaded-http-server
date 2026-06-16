@@ -1,6 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include "thread_pool.h"
+#include "server_stats.h"
+#include <string>
 
 class BasicServer
 {
@@ -9,6 +11,7 @@ private:
     int port;
 
     ThreadPool threadPool;
+    ServerStats stats;
 
 public:
     explicit BasicServer(int port);
@@ -20,6 +23,7 @@ public:
     void handleClient(
         int client_socket
     );
+    std::string generateStatsPage();
 };
 
 #endif

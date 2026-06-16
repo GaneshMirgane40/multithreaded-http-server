@@ -15,4 +15,5 @@ add_executable(
     src/file_handler.cpp
     src/logger.cpp
     src/thread_pool.cpp
+    src/server_stats.cpp
 )

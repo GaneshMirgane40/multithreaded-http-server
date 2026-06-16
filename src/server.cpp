@@ -134,6 +134,7 @@ void BasicServer::handleClient(
     std::string rawRequest(buffer);
 
     HttpRequest request;
+    stats.incrementTotal();
 
     if(bytes_received < 0)
     {
@@ -179,17 +180,37 @@ void BasicServer::handleClient(
         std::cout
             << "==========================\n";
     }
+Router router;
+FileHandler fileHandler;
 
-    Router router;
-    FileHandler fileHandler;
+std::string body;
+bool is404 = false;
 
+if(request.path == "/stats")
+{
+    body =
+        generateStatsPage();
+
+    stats.incrementSuccess();
+}
+else
+{
     std::string filepath =
         router.route(request.path);
 
-    bool is404 =
+    is404 =
         (filepath == "../public/404.html");
 
-    std::string body =
+    if(is404)
+    {
+        stats.incrementNotFound();
+    }
+    else
+    {
+        stats.incrementSuccess();
+    }
+
+    body =
         fileHandler.readFile(filepath);
 
     std::cout
@@ -201,6 +222,7 @@ void BasicServer::handleClient(
         << "Body size: "
         << body.size()
         << "\n";
+}
 
     std::string statusLine =
         is404
@@ -225,4 +247,29 @@ void BasicServer::handleClient(
     );
 
     close(client_socket);
+}
+std::string BasicServer::generateStatsPage()
+{
+    return
+        "<html>"
+        "<head><title>Server Stats</title></head>"
+        "<body>"
+        "<h1>Server Statistics</h1>"
+        "<p>Total Requests: "
+        + std::to_string(
+            stats.getTotal()
+        )
+        + "</p>"
+        "<p>Successful Requests: "
+        + std::to_string(
+            stats.getSuccess()
+        )
+        + "</p>"
+        "<p>404 Requests: "
+        + std::to_string(
+            stats.getNotFound()
+        )
+        + "</p>"
+        "</body>"
+        "</html>";
 }
