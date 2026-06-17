@@ -12,13 +12,17 @@
 #include "logger.h"
 #include "mime_types.h"
 
-BasicServer::BasicServer(int port)
+BasicServer::BasicServer(
+    int port,
+    int numThreads
+)
     : server_socket(-1),
       port(port),
-      threadPool(4),
+      threadPool(numThreads),
       running(true)
 {
 }
+
 
 bool BasicServer::start()
 {

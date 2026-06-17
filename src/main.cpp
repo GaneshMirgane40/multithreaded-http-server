@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <csignal>
+#include "config.h"
 
 BasicServer* serverPtr = nullptr;
 
@@ -19,12 +20,27 @@ void signalHandler(int signal)
 
 int main()
 {
+    Config config;
+
+if(
+    !config.load(
+        "../config/server.config"
+    )
+)
+{
+    std::cout
+        << "Failed to load config file\n";
+
+    return 1;
+}
     std::signal(
         SIGINT,
         signalHandler
     );
-
-    BasicServer server(8080);
+BasicServer server(
+    config.getPort(),
+    config.getThreads()
+);
 
     serverPtr = &server;
 

@@ -14,7 +14,10 @@ private:
     ServerStats stats;
     bool running;
 public:
-    explicit BasicServer(int port);
+    BasicServer(
+    int port,
+    int numThreads
+);
 
     bool start();
 
