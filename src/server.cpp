@@ -209,6 +209,16 @@ if(request.path == "/stats")
 
     stats.incrementSuccess();
 }
+else if(
+    request.path
+    == "/api/stats"
+)
+{
+    body =
+        generateStatsJson();
+
+    stats.incrementSuccess();
+}
 else
 {
     std::string filepath =
@@ -247,10 +257,23 @@ else
         std::string contentType =
     "text/html";
 
-if(request.path != "/stats")
+if(
+    request.path
+    == "/api/stats"
+)
+{
+    contentType =
+        "application/json";
+}
+else if(
+    request.path
+    != "/stats"
+)
 {
     std::string filepath =
-        router.route(request.path);
+        router.route(
+            request.path
+        );
 
     contentType =
         MimeTypes::getMimeType(
@@ -303,4 +326,25 @@ std::string BasicServer::generateStatsPage()
         + "</p>"
         "</body>"
         "</html>";
+}
+std::string BasicServer::generateStatsJson()
+{
+    return
+        "{\n"
+        "    \"totalRequests\": "
+        + std::to_string(
+            stats.getTotal()
+        )
+        + ",\n"
+        "    \"successfulRequests\": "
+        + std::to_string(
+            stats.getSuccess()
+        )
+        + ",\n"
+        "    \"notFoundRequests\": "
+        + std::to_string(
+            stats.getNotFound()
+        )
+        + "\n"
+        "}";
 }

@@ -28,6 +28,7 @@ public:
         int client_socket
     );
     std::string generateStatsPage();
+    std::string generateStatsJson();
 };
 
 #endif
